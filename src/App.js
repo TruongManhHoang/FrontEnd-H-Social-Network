@@ -1,24 +1,48 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import './App.css';
+import Authentication from './pages/Authentication/Authentication';
+import HomePage from './pages/HomePage/HomePage';
+import Message from './pages/Message/Message';
+import { useDispatch, useSelector } from 'react-redux';
+import { getProfileAction } from './Redux/Auth/auth.action';
 
 function App() {
+  const dispatch = useDispatch();
+  const { auth } = useSelector((store) => store);
+  const jwt = localStorage.getItem('jwt');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (jwt) {
+      dispatch(getProfileAction(jwt)).finally(() =>
+        setLoading(false)
+      );
+    } else {
+      setLoading(false);
+    }
+  }, [dispatch, jwt]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/auth" element={<Authentication />} />
+      <Route
+        path="/*"
+        element={
+          auth.user ? <HomePage /> : <Authentication />
+        }
+      />
+      <Route
+        path="/message"
+        element={
+          auth.user ? <Message /> : <Authentication />
+        }
+      />
+    </Routes>
   );
 }
 

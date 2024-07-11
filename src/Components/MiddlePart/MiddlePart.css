@@ -1,0 +1,51 @@
+/* styles.css */
+.story-container {
+  display: flex;
+  overflow: hidden;
+  width: calc(6 * 5.5rem); /* Kích thước của 4 stories */
+  padding: 12px 0;
+  position: relative;
+  max-width: 100%;
+}
+
+.story-wrapper {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.story-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.story-item {
+  scroll-snap-align: center;
+  flex: 0 0 auto;
+  width: 5rem; /* Kích thước của một story */
+  margin-right: 1rem; /* Khoảng cách giữa các stories */
+}
+
+.arrow-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.arrow-button.left {
+  left: 0;
+}
+
+.arrow-button.right {
+  right: 0;
+}
