@@ -13,7 +13,6 @@ const initialState = {
   loading: false,
   error: null,
   message: null,
-  user: [],
 };
 
 export const messageReducer = (
@@ -32,7 +31,6 @@ export const messageReducer = (
         loading: false,
         error: null,
       };
-
     case CREATE_CHAT_SUCCESS:
       return {
         ...state,

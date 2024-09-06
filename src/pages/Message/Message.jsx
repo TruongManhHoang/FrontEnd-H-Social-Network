@@ -19,7 +19,7 @@ import {
 } from '../../Redux/Message/message.action';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import SockJS from 'sockjs-client';
-import Stom from 'stompjs';
+import Stomp from 'stompjs';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { uploadToCloudinary } from '../../utils/uploadToCloundniry';
 import UserChatCard from './UserChatCar';
@@ -39,43 +39,79 @@ const Message = () => {
 
   useEffect(() => {
     const sock = new SockJS('http://localhost:8080/api/ws');
-    const stomp = Stom.over(sock);
+    const stomp = Stomp.over(sock);
     setStompClient(stomp);
     stomp.connect({}, onConnect, onError);
   }, []);
 
   const onConnect = () => {
     console.log('websocket connected.....');
+    if (stompClient && currentChat) {
+      const subscription = stompClient.subscribe(
+        `/user/${currentChat.id}/private`,
+        onMessageReceive
+      );
+      console.log(
+        `Subscribed to /user/${currentChat.id}/private`
+      );
+    }
   };
+
   const onError = (e) => {
     console.log('Error....', e);
   };
 
   useEffect(() => {
-    if (stompClient && auth.user && currentChat) {
+    if (
+      stompClient &&
+      stompClient.connected &&
+      auth.user &&
+      currentChat
+    ) {
       const subscription = stompClient.subscribe(
         `/user/${currentChat.id}/private`,
         onMessageReceive
       );
-      return () => subscription.unsubscribe();
+      console.log(
+        `Subscribed to /user/${currentChat.id}/private`
+      );
+      return () => {
+        console.log(
+          `Unsubscribed from /user/${currentChat.id}/private`
+        );
+        subscription.unsubscribe();
+      };
     }
   }, [stompClient, auth.user, currentChat]);
 
   const sendMessageToServer = (newMessage) => {
     if (stompClient && newMessage) {
+      console.log(
+        'Sending message to server: ',
+        newMessage
+      );
       stompClient.send(
-        `/app/chat/${currentChat?.id.toString()}`,
+        `api/app/chat/${currentChat?.id.toString()}`,
         {},
         JSON.stringify(newMessage)
+      );
+    } else {
+      console.log(
+        'Unable to send message: stompClient or newMessage is missing'
       );
     }
   };
 
-  const onMessageReceive = (newMessage) => {
+  const onMessageReceive = (payload) => {
+    const receivedMessage = JSON.parse(payload.body);
     console.log(
       'message received from websocket ',
-      newMessage
+      receivedMessage
     );
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      receivedMessage,
+    ]);
   };
 
   useEffect(() => {
@@ -135,17 +171,19 @@ const Message = () => {
                   <SearchUser />
                 </div>
                 <div className="h-full space-y-4 mt-5 overflow-y-scroll hideScrollBar">
-                  {message.chats.map((item, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        setCurrentChat(item);
-                        setMessages(item.messages);
-                      }}
-                    >
-                      <UserChatCard item={item} />
-                    </div>
-                  ))}
+                  {message.chats.map((item, index) => {
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          setCurrentChat(item);
+                          setMessages(item.messages);
+                        }}
+                      >
+                        <UserChatCard item={item} />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

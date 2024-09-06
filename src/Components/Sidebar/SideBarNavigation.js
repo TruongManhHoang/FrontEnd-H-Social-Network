@@ -19,11 +19,6 @@ export const navigationMenu = [
     path: '/reels',
   },
   {
-    title: 'Create Reels',
-    icon: <ControlPointIcon />,
-    path: '/create-reels',
-  },
-  {
     title: 'Notifications',
     icon: <NotificationsIcon />,
     path: '/',

@@ -34,10 +34,6 @@ export default function ProfileModal({
 }) {
   const dispatch = useDispatch();
 
-  const handleSubmit = (values) => {
-    console.log('values ', values);
-  };
-
   const formik = useFormik({
     initialValues: {
       firstName: '',
@@ -46,6 +42,7 @@ export default function ProfileModal({
     onSubmit: (values) => {
       console.log('values', values);
       dispatch(updateProfileAction(values));
+      handleClose();
     },
   });
 

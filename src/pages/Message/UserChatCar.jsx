@@ -9,7 +9,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useSelector } from 'react-redux';
 
 const UserChatCard = ({ item }) => {
-  // console.log('chat......', item);
   const auth = useSelector((state) => state.auth);
 
   return (

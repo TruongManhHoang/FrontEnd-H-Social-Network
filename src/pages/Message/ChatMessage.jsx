@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 const ChatMessage = ({ item }) => {
   const auth = useSelector((state) => state.auth);
-  const isCurrentUser = auth.user?.id === item.senderId;
+  const isCurrentUser = auth.user?.id === item.user?.id;
   // console.log('item', item);
   return (
     <div

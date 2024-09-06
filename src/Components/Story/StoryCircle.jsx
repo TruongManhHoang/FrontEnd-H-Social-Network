@@ -7,8 +7,6 @@ import ShowImage from './ShowImage';
 const StoryCircle = ({ item }) => {
   const dispatch = useDispatch();
 
-  console.log('item story', item);
-
   const [showImage, setShowImage] = useState(false);
 
   const handleOpenShowImage = () => {

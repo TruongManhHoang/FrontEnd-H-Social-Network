@@ -1,0 +1,29 @@
+.reel-card {
+  max-width: 700px;
+  margin: 10px auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.reel-card:hover {
+  transform: scale(1.02);
+}
+
+.reel-card-header {
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+.reel-card-content {
+  padding: 16px;
+  background-color: #fff;
+}
+
+.reel-video {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  border-top: 1px solid #f0f0f0;
+}

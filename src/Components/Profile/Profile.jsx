@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -6,11 +7,20 @@ import {
   Tab,
   Tabs,
 } from '@mui/material';
-import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PostCard from '../Post/PostCard';
 import UserReelCard from '../Reels/UserReelCard';
-import { useSelector } from 'react-redux';
 import ProfileModal from './ProfileModal';
+import ShowFollow from './ShowFollow';
+import {
+  getAllReel,
+  getReelByUser,
+} from '../../Redux/Reel/reel.action';
+import {
+  getAllPostAction,
+  getUsersPostAction,
+} from '../../Redux/Post/post.action';
+import SavePost from '../Post/SavePost';
 
 const tabs = [
   { value: 'post', name: 'Post' },
@@ -18,30 +28,52 @@ const tabs = [
   { value: 'saved', name: 'Saved' },
   { value: 'report', name: 'Report' },
 ];
-const posts = [1, 1, 1, 1, 1];
-const reels = [1, 1, 1, 1];
-const savedPost = [1, 1, 1];
 
 const Profile = () => {
-  const [open, setOpen] = React.useState(false);
+  const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const [openFollow, setOpenFollow] = useState(false);
+  const [followType, setFollowType] = useState('');
+
   const handleOpenProfileModal = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [value, setValue] = React.useState('post');
+  const handleOpenFollow = (type) => {
+    setFollowType(type);
+    setOpenFollow(true);
+  };
+  const handleCloseFollow = () => setOpenFollow(false);
 
-  const { auth } = useSelector((store) => store);
+  const [value, setValue] = useState('post');
+
+  const auth = useSelector((store) => store.auth);
+  const reels = useSelector((store) => store.reel.reels);
+  const posts = useSelector((store) => store.post.posts);
+  const postsUser = useSelector(
+    (store) => store.post.posts.users
+  );
+  // const following = useSelector(
+  //   (store) => store.auth.follow
+  // );
+
+  console.log('Following', auth.user.followings);
+  useEffect(() => {
+    dispatch(getAllPostAction());
+    if (auth.user) {
+      dispatch(getUsersPostAction(auth.user.id));
+    }
+    dispatch(getAllReel());
+    if (auth.user) {
+      dispatch(getReelByUser(auth.user.id));
+    }
+  }, [dispatch, auth.user]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
-  const firstName = auth.user?.firstName || '';
-  const lastName = auth.user?.lastName || '';
-  const followers = auth.user?.followers || 0;
-  const followings = auth.user?.followings || 0;
-
   return (
     <Card className="my-10 w-[70%]">
       <div className="rounded-md">
+        {/* Profile Header */}
         <div className="h-[15rem]">
           <img
             className="w-full h-full rounded-t-md"
@@ -55,7 +87,6 @@ const Profile = () => {
             sx={{ width: '9rem', height: '10rem' }}
             src="https://img.freepik.com/premium-vector/young-smiling-man-avatar-man-with-brown-beard-mustache-hair-wearing-yellow-sweater-sweatshirt-3d-vector-people-character-illustration-cartoon-minimal-style_365941-860.jpg"
           />
-
           <Button
             sx={{ borderRadius: '20px' }}
             variant="outlined"
@@ -64,30 +95,34 @@ const Profile = () => {
             Edit Profile
           </Button>
         </div>
-
+        {/* Profile Information */}
         <div className="p-3">
           <div>
-            <h1 className="py-1 font-bold text-x1">
-              {`${firstName} ${lastName}`}
-            </h1>
+            <h1 className="py-1 font-bold text-x1">{`${auth.user?.firstName} ${auth.user?.lastName}`}</h1>
             <p>
               @
-              {firstName && lastName
-                ? `${firstName.toLowerCase()}_${lastName.toLowerCase()}`
+              {auth.user?.firstName && auth.user?.lastName
+                ? `${auth.user?.firstName.toLowerCase()}_${auth.user?.lastName.toLowerCase()}`
                 : ''}
             </p>
           </div>
-
           <div className="flex gap-2 items-center py-3">
-            <span>{`${followers} follower`}</span>
-            <span>{`${followers} follower`}</span>
-            <span>{`${followings} following`}</span>
+            <Button
+              onClick={() => handleOpenFollow('followers')}
+            >
+              {`${auth.user?.followers?.length} follower`}
+            </Button>
+            <Button
+              onClick={() => handleOpenFollow('followings')}
+            >
+              {`${auth.user?.followings?.length} following`}
+            </Button>
           </div>
-
           <div>
-            <p>Hi my name is Hoang</p>
+            <p>Hi my name is {auth.user?.firstName}</p>
           </div>
         </div>
+        {/* Tabs for Post, Reels, Saved, Report */}
         <section>
           <Box
             sx={{
@@ -111,25 +146,12 @@ const Profile = () => {
               ))}
             </Tabs>
           </Box>
-
+          {/* Tab Content */}
           <div className="flex justify-center">
             {value === 'post' ? (
+              // Display Posts
               <div className="space-y-5 w-[70%] my-10">
                 {posts.map((item, index) => (
-                  <div className="border border-slate-100">
-                    <PostCard item={item} key={index} />
-                  </div>
-                ))}
-              </div>
-            ) : value === 'reels' ? (
-              <div className="flex justify-center flex-wrap gap-2 my-10 ">
-                {reels.map((item, index) => (
-                  <UserReelCard key={index} />
-                ))}
-              </div>
-            ) : value === 'saved' ? (
-              <div className="space-y-5 w-[70%] my-10">
-                {savedPost.map((item, index) => (
                   <div
                     className="border border-slate-100"
                     key={index}
@@ -138,16 +160,44 @@ const Profile = () => {
                   </div>
                 ))}
               </div>
+            ) : value === 'reels' ? (
+              // Display Reels
+              <div className="flex justify-center flex-wrap gap-2 my-10">
+                {reels.map((reel, index) => (
+                  <UserReelCard key={index} item={reel} />
+                ))}
+              </div>
+            ) : value === 'saved' ? (
+              // Display Saved Posts
+              <div className="space-y-5 w-[70%] my-10">
+                {postsUser && postsUser.length > 0 ? (
+                  postsUser.map((user, index) => (
+                    <SavePost item={user} />
+                  ))
+                ) : (
+                  <p>No saved posts found</p>
+                )}
+              </div>
             ) : (
               <div>Repost</div>
             )}
           </div>
         </section>
       </div>
+      {/* Profile Modal */}
       <section>
         <ProfileModal
           open={open}
           handleClose={handleClose}
+        />
+        <ShowFollow
+          open={openFollow}
+          handleClose={handleCloseFollow}
+          title={
+            followType === 'followers'
+              ? 'Followers'
+              : 'Followings'
+          }
         />
       </section>
     </Card>

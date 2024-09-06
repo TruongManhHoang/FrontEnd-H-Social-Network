@@ -19,21 +19,16 @@ const MiddlePart = () => {
   const postState = useSelector((store) => store.post);
   const storyState = useSelector((store) => store.story);
 
-  console.log('post store', postState);
-  console.log('story store', storyState);
-
   const [openCreatePostModal, setOpenCreatePostModal] =
     useState(false);
   const [openCreateStoryModal, setOpenCreateStoryModal] =
     useState(false);
-
   const handleCloseCreatePostModal = () =>
     setOpenCreatePostModal(false);
   const handleOpenCreatePostModal = () => {
     setOpenCreatePostModal(true);
     console.log('Open post modal...');
   };
-
   const handleOpenCreateStoryModal = () =>
     setOpenCreateStoryModal(true);
   const handleCloseCreateStoryModal = () =>

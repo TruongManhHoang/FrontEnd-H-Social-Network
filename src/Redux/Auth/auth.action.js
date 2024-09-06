@@ -1,6 +1,12 @@
 import axios from 'axios';
 import { API_BASE_URL, api } from '../../config/api';
 import {
+  FOLLOW_USER_FAILURE,
+  FOLLOW_USER_REQUEST,
+  FOLLOW_USER_SUCCESS,
+  GET_ALL_USER_FAILURE,
+  GET_ALL_USER_REQUEST,
+  GET_ALL_USER_SUCCESS,
   GET_PROFILE_FAILURE,
   GET_PROFILE_REQUEST,
   GET_PROFILE_SUCCESS,
@@ -65,7 +71,6 @@ export const getProfileAction =
           },
         }
       );
-      console.log('profile', data);
       dispatch({
         type: GET_PROFILE_SUCCESS,
         payload: data,
@@ -83,14 +88,20 @@ export const updateProfileAction =
   (reqData) => async (dispatch) => {
     dispatch({ type: UPDATE_PROFILE_REQUEST });
     try {
+      const jwt = localStorage.getItem('jwt');
       const { data } = await api.put(
         `${API_BASE_URL}/users`,
-        reqData
+        reqData,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
       );
       console.log('update Profile', data);
       dispatch({
         type: UPDATE_PROFILE_SUCCESS,
-        payload: data,
+        payload: data.result,
       });
     } catch (error) {
       console.log('----------', error);
@@ -120,3 +131,45 @@ export const searchUser = (query) => async (dispatch) => {
     });
   }
 };
+export const getAllUserAction = () => async (dispatch) => {
+  dispatch({ type: GET_ALL_USER_REQUEST });
+  try {
+    const { data } = await api.get(`${API_BASE_URL}/users`);
+    dispatch({
+      type: GET_ALL_USER_SUCCESS,
+      payload: data.result,
+    });
+  } catch (error) {
+    console.log('Error', error);
+    dispatch({
+      type: GET_ALL_USER_FAILURE,
+      payload: error,
+    });
+  }
+};
+export const followUserAction =
+  (userId) => async (dispatch) => {
+    dispatch({ type: FOLLOW_USER_REQUEST });
+    try {
+      const jwt = localStorage.getItem('jwt');
+      const { data } = await api.put(
+        `${API_BASE_URL}/users/follow/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwt}`,
+          },
+        }
+      );
+      dispatch({
+        type: FOLLOW_USER_SUCCESS,
+        payload: data.result,
+      });
+      console.log('follow', data.result);
+    } catch (error) {
+      console.log('Error', error);
+      dispatch({
+        type: FOLLOW_USER_FAILURE,
+        payload: error,
+      });
+    }
+  };

@@ -25,16 +25,17 @@ export const createMessage =
           },
         }
       );
+      reqData.sendMessageToServer(data.result);
       dispatch({
         type: CREATE_MESSAGE_SUCCESS,
         payload: data.result,
       });
-      console.log('created message', data.result);
+      console.log('Created message:', data.result);
     } catch (error) {
-      console.log('Error', error);
+      console.error('Error in createMessage:', error);
       dispatch({
         type: CREATE_MESSAGE_FAILURE,
-        payload: error,
+        payload: error.message,
       });
     }
   };
@@ -54,7 +55,7 @@ export const createChat = (chat) => async (dispatch) => {
     );
     dispatch({
       type: CREATE_CHAT_SUCCESS,
-      payload: data,
+      payload: data.result,
     });
     console.log('created chat', data.result);
   } catch (error) {

@@ -45,7 +45,6 @@ export const getAllStory = () => async (dispatch) => {
       type: GET_ALL_STORY_SUCCESS,
       payload: data.result,
     });
-    console.log('Get all story', data.result);
   } catch (error) {
     console.log('Get all story fail', error);
     dispatch({

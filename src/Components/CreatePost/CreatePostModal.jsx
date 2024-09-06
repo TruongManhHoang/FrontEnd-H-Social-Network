@@ -37,8 +37,6 @@ const CreatePostModal = ({ handleClose, open }) => {
 
   const user = useSelector((state) => state.auth.user);
 
-  console.log('user', user);
-
   const dispatch = useDispatch();
 
   const handleSelectImage = async (event) => {
@@ -58,7 +56,7 @@ const CreatePostModal = ({ handleClose, open }) => {
       event.target.files[0],
       'video'
     );
-    setSelectedImage(videoUrl);
+    setSelectedVideo(videoUrl);
     setIsLoading(false);
     formik.setFieldValue('video', videoUrl);
   };
@@ -138,9 +136,11 @@ const CreatePostModal = ({ handleClose, open }) => {
                   style={{ display: 'none' }}
                   id="video-input"
                 />
-
                 <label htmlFor="video-input">
-                  <IconButton color="primary">
+                  <IconButton
+                    color="primary"
+                    component="span"
+                  >
                     <VideoCallIcon />
                   </IconButton>
                 </label>
@@ -152,6 +152,15 @@ const CreatePostModal = ({ handleClose, open }) => {
                 <img
                   className="h-[10rem"
                   src={selectedImage}
+                  alt=""
+                />
+              </div>
+            )}
+            {selectedVideo && (
+              <div>
+                <video
+                  className="h-[10rem"
+                  src={selectedVideo}
                   alt=""
                 />
               </div>
